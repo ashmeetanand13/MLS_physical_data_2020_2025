@@ -43,10 +43,12 @@ def load_data(uploaded_file=None):
     if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
     else:
-        # Try to load from local file if it exists
+        # Load from GitHub
         try:
-            df = pd.read_csv('mls_physical.csv')
-        except FileNotFoundError:
+            github_url = "https://github.com/ashmeetanand13/MLS_physical_data_2020_2025/blob/main/mls_physical.csv"
+            df = pd.read_csv(github_url)
+        except Exception as e:
+            st.error(f"Error loading data from GitHub: {str(e)}")
             return None, None
     
     # Convert date columns
