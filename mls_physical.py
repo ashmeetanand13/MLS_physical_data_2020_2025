@@ -157,23 +157,9 @@ def aggregate_team_metrics(df, method='weighted'):
         # Simple average
         return df.groupby(['Match ID', 'Team'])[physical_cols].mean().reset_index()
 
-# Load the data
-uploaded_file = st.sidebar.file_uploader(
-    "Upload MLS Physical Data CSV",
-    type=['csv'],
-    help="Upload the mls_physical.csv file"
-)
-
-if uploaded_file is not None:
-    df, position_benchmarks = load_data(uploaded_file)
-else:
-    # Try to load from local file
+# Load the data from GitHub
+with st.spinner("Loading data from GitHub..."):
     df, position_benchmarks = load_data()
-    
-if df is None:
-    st.error("⚠️ Please upload the MLS physical data CSV file using the sidebar uploader.")
-    st.info("The file should contain columns like: Player, Team, Match, Date, Distance, HSR Distance, Sprint Distance, etc.")
-    st.stop()
 
 # Title and description
 st.title("⚽ MLS Physical Performance Analytics Dashboard")
