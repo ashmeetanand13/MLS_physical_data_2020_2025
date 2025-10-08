@@ -40,16 +40,13 @@ st.markdown("""
 # Load data function
 @st.cache_data
 def load_data(uploaded_file=None):
-    if uploaded_file is not None:
-        df = pd.read_csv(uploaded_file)
-    else:
-        # Load from GitHub
-        try:
-            github_url = "https://github.com/ashmeetanand13/MLS_physical_data_2020_2025/blob/main/mls_physical.csv"
-            df = pd.read_csv(github_url)
-        except Exception as e:
-            st.error(f"Error loading data from GitHub: {str(e)}")
-            return None, None
+    # Load from GitHub (CORRECTED URL)
+    try:
+        github_url = "https://raw.githubusercontent.com/ashmeetanand13/MLS_physical_data_2020_2025/main/mls_physical.csv"
+        df = pd.read_csv(github_url)
+    except Exception as e:
+        st.error(f"Error loading data from GitHub: {str(e)}")
+        return None, None
     
     # Convert date columns
     df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
@@ -158,8 +155,17 @@ def aggregate_team_metrics(df, method='weighted'):
         return df.groupby(['Match ID', 'Team'])[physical_cols].mean().reset_index()
 
 # Load the data from GitHub
+# Load the data from GitHub
 with st.spinner("Loading data from GitHub..."):
     df, position_benchmarks = load_data()
+
+# CHECK IF LOADING FAILED - STOP THE APP
+if df is None:
+    st.error("⚠️ Failed to load data from GitHub. Please check:")
+    st.write("1. The GitHub URL is correct")
+    st.write("2. The CSV file exists at that location")
+    st.write("3. The repository is public")
+    st.stop()
 
 # Title and description
 st.title("⚽ MLS Physical Performance Analytics Dashboard")
@@ -167,6 +173,7 @@ st.markdown("### Comprehensive physical performance analysis across teams, playe
 
 # Sidebar filters
 st.sidebar.header("🎯 Global Filters")
+
 selected_seasons = st.sidebar.multiselect(
     "Select Seasons",
     options=sorted(df['Year'].unique()),
